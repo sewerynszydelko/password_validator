@@ -41,7 +41,7 @@ class LenghtValidator(Validator):
         raise ValidationError("Text is too short")
 
 
-class PasswordValidator(Validatorl):
+class PasswordValidator(Validator):
 
     def __init__(self,password) -> None:
         self.password = password
