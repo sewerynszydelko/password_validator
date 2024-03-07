@@ -1,3 +1,4 @@
+import string
 from abc import ABC, abstractmethod
 from requests import get
 
@@ -14,7 +15,7 @@ class Validator(ABC):
         pass
 
     @abstractmethod
-    def is_valid(self, text):
+    def is_valid(self):
         pass
 
 
@@ -41,7 +42,7 @@ class LenghtValidator(Validator):
         raise ValidationError("Text is too short")
 
 
-class HasLowerLetterValidator(Validator):
+class HasLowerCharactersValidator(Validator):
 
     def __init__(self, text):
         self.text = text
@@ -51,6 +52,42 @@ class HasLowerLetterValidator(Validator):
             return True
 
         raise ValidationError("Text has no lower letters")
+
+
+class HasUpperCharactersValidator(Validator):
+
+    def __init__(self, text):
+        self.text = text
+
+    def is_valid(self):
+        if any(letter.isupper() for letter in self.text):
+            return True
+
+        raise ValidationError("Text has no Upper case letters")
+
+
+class HasNumberValidator(Validator):
+
+    def __init__(self, text):
+        self.text = text
+
+    def is_valid(self):
+        if any(char.isnumeric() for char in self.text):
+            return True
+
+        raise ValidationError("Text has no numbers")
+
+
+class HasPunctuationValidator(Validator):
+
+    def __init__(self, text):
+        self.text = text
+
+    def is_valid(self):
+        if any(char in string.punctuation for char in self.text):
+            return True
+
+        raise ValidationError("Text has no punctiations like:'!@#$%^&*()_+'")
 
 
 class PasswordValidator(Validator):
