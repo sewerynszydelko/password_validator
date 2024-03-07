@@ -41,9 +41,21 @@ class LenghtValidator(Validator):
         raise ValidationError("Text is too short")
 
 
+class HasLowerLetterValidator(Validator):
+
+    def __init__(self, text):
+        self.text = text
+
+    def is_valid(self):
+        if any(letter.islower() for letter in self.text):
+            return True
+
+        raise ValidationError("Text has no lower letters")
+
+
 class PasswordValidator(Validator):
 
-    def __init__(self,password) -> None:
+    def __init__(self, password) -> None:
         self.password = password
 
     def is_valid(self):
