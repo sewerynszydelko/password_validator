@@ -3,7 +3,8 @@ from validators import (LenghtValidator,
                         HasLowerCharactersValidator,
                         HasUpperCharactersValidator,
                         HasNumberValidator,
-                        HasPunctuationValidator)
+                        HasPunctuationValidator,
+                        HaveBeenPwndValidator)
 import pytest
 
 
@@ -109,6 +110,7 @@ def test_if_text_has_punctuation_validator_positive():
     # then
     assert result is True
 
+
 def test_if_text_has_punctuation_validator_negative():
     # given
     validator = HasPunctuationValidator("abcssda")
@@ -117,3 +119,34 @@ def test_if_text_has_punctuation_validator_negative():
     with pytest.raises(ValidationError) as error:
         validator.is_valid()
         assert "Text has no punctiations like:'!@#$%^&*()_+'" in str(error.value)
+
+
+def test_if_text_been_powned_validator_positive(requests_mock):
+    # given
+    mock_respone = "D09CA3762AF61E59520943DC26494F8941B:42542807"
+    hashe_serched = "BA2CC086FC04994F05501E127257173697071519"
+
+    requests_mock.get("https://api.pwnedpasswords.com/range/" +
+                      hashe_serched[:5], text=mock_respone)
+    validator = HaveBeenPwndValidator("DFSJI432$@$dfas")
+    # when
+    result = validator.is_valid()
+
+    # then
+    assert result is True
+
+
+def test_is_text_benn_powned_validator_negative(requests_mock):
+    # given
+    mock_respone = "D09CA3762AF61E59520943DC26494F8941B:42542807"
+    hashe_serched = "7C4A8D09CA3762AF61E59520943DC26494F8941B"
+
+    requests_mock.get("https://api.pwnedpasswords.com/range/" +
+                      hashe_serched[:5], text=mock_respone)
+    validator = HaveBeenPwndValidator("123456")
+
+    # when
+    with pytest.raises(ValidationError) as error:
+        validator.is_valid()
+    # then
+        assert "Password has been powned !!" in str(error.value)
