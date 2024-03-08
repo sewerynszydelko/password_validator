@@ -1,6 +1,7 @@
 import string
 from abc import ABC, abstractmethod
 from requests import get
+from hashlib import sha1
 
 
 class ValidationError(Exception):
@@ -88,6 +89,25 @@ class HasPunctuationValidator(Validator):
             return True
 
         raise ValidationError("Text has no punctiations like:'!@#$%^&*()_+'")
+
+
+class HaveBeenPwndValidator(Validator):
+
+    def __init__(self, text):
+        self.text = text
+
+    def is_valid(self):
+        hashed_password = sha1(self.text.encode("utf-8")).hexdigest().upper()
+        respone = get("https://api.pwnedpasswords.com/range/" +
+                      hashed_password[:5], timeout=7)
+
+        splited_data = respone.text.splitlines()
+        hashe_data = [data[:data.find(":")] for data in splited_data]
+
+        if hashed_password[5:] in hashe_data:
+            raise ValidationError("Password has been powned !!")
+
+        return True
 
 
 class PasswordValidator(Validator):
