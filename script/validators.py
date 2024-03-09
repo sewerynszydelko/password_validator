@@ -5,6 +5,7 @@ from hashlib import sha1
 
 
 class ValidationError(Exception):
+    """ Error for validator"""
     pass
 
 
@@ -44,11 +45,17 @@ class LenghtValidator(Validator):
 
 
 class HasLowerCharactersValidator(Validator):
+    """ Check of given text has any lower case characters """
 
     def __init__(self, text):
+        """Initalize obj with given data"""
         self.text = text
 
-    def is_valid(self):
+    def is_valid(self) -> bool:
+        """ Look if any leter is lower in given text
+        Returns:
+            Bool: True or Raise Error with messegae
+        """
         if any(letter.islower() for letter in self.text):
             return True
 
@@ -56,11 +63,19 @@ class HasLowerCharactersValidator(Validator):
 
 
 class HasUpperCharactersValidator(Validator):
+    """ Upper Case Validator """
 
     def __init__(self, text):
+        """Initalize obj"""
         self.text = text
 
     def is_valid(self):
+        """
+        Raises:
+            ValidationError: riases with message if is not valid
+        Returns:
+            bool: True or Raise error
+        """
         if any(letter.isupper() for letter in self.text):
             return True
 
@@ -68,11 +83,18 @@ class HasUpperCharactersValidator(Validator):
 
 
 class HasNumberValidator(Validator):
+    """ Number Validator """
 
     def __init__(self, text):
         self.text = text
 
     def is_valid(self):
+        """Check if data hvae any number
+        Raises:
+            ValidationError: Raises when is not valid
+        Returns:
+            bool: True or riase error with proper message
+        """
         if any(char.isnumeric() for char in self.text):
             return True
 
@@ -80,7 +102,7 @@ class HasNumberValidator(Validator):
 
 
 class HasPunctuationValidator(Validator):
-
+    """ Punctuation Validator """
     def __init__(self, text):
         self.text = text
 
@@ -92,11 +114,18 @@ class HasPunctuationValidator(Validator):
 
 
 class HaveBeenPwndValidator(Validator):
+    """  Api Have Been Powned Validator """
 
     def __init__(self, text):
         self.text = text
 
-    def is_valid(self):
+    def is_valid(self) -> bool:
+        """ Check if data is powned
+        Raises:
+            ValidationError: Raises if data is leaaked
+        Returns:
+            bool: True if valid or rasies Eror with proper message
+        """
         hashed_password = sha1(self.text.encode("utf-8")).hexdigest().upper()
         respone = get("https://api.pwnedpasswords.com/range/" +
                       hashed_password[:5], timeout=7)
