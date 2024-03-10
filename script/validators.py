@@ -1,32 +1,29 @@
+""" Validators main file """
 import string
 from abc import ABC, abstractmethod
-from requests import get
 from hashlib import sha1
+from requests import get
 
 
 class ValidationError(Exception):
-    """ Error for validator"""
-    pass
+    """Error for validator"""
 
 
 class Validator(ABC):
-    """ Validator interface
-    """
+    """ Validator interface for Validators """
     @abstractmethod
     def __init__(self, text):
-        pass
+        """Force to iplement __init__ method"""
 
     @abstractmethod
     def is_valid(self):
-        pass
+        """Force to iplement is_valid method"""
 
 
 class LenghtValidator(Validator):
-    """ Lenght Validaotr
-    """
+    """ Lenght Validaotr """
 
     def __init__(self, text):
-        """ Initalize validaotr lenght"""
         self.text = text
 
     def is_valid(self, lenght=8) -> bool:
@@ -38,7 +35,7 @@ class LenghtValidator(Validator):
         Returns:
             bool : True or raise error
         """
-        if len(self.text) == lenght:
+        if len(self.text) >= lenght:
             return True
 
         raise ValidationError("Text is too short")
@@ -48,7 +45,6 @@ class HasLowerCharactersValidator(Validator):
     """ Check of given text has any lower case characters """
 
     def __init__(self, text):
-        """Initalize obj with given data"""
         self.text = text
 
     def is_valid(self) -> bool:
@@ -66,7 +62,6 @@ class HasUpperCharactersValidator(Validator):
     """ Upper Case Validator """
 
     def __init__(self, text):
-        """Initalize obj"""
         self.text = text
 
     def is_valid(self):
@@ -103,10 +98,17 @@ class HasNumberValidator(Validator):
 
 class HasPunctuationValidator(Validator):
     """ Punctuation Validator """
+
     def __init__(self, text):
         self.text = text
 
-    def is_valid(self):
+    def is_valid(self) -> bool:
+        """ Check if text is valid
+        Raises:
+            ValidationError: text has no punctuations
+        Returns:
+            bool: True or raise error
+        """
         if any(char in string.punctuation for char in self.text):
             return True
 
@@ -140,9 +142,23 @@ class HaveBeenPwndValidator(Validator):
 
 
 class PasswordValidator(Validator):
-
+    """Password validator"""
     def __init__(self, password) -> None:
         self.password = password
+        self.validators = [LenghtValidator,
+                        HasLowerCharactersValidator,
+                        HasUpperCharactersValidator,
+                        HasNumberValidator,
+                        HasPunctuationValidator,
+                        HaveBeenPwndValidator]
 
-    def is_valid(self):
-        pass
+    def is_valid(self) -> bool:
+        """ Check if password is valid
+        Returns:
+            bool: True if is valid
+        """
+        for clas_name in self.validators:
+            result = clas_name(self.password)
+            result.is_valid()
+
+        return True
