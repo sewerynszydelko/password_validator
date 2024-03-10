@@ -155,7 +155,7 @@ class PasswordValidator(Validator):
     def is_valid(self) -> bool:
         """ Check if password is valid
         Returns:
-            bool: True if is valid
+            bool: Return True if all pasword pass all validators
         """
         for clas_name in self.validators:
             result = clas_name(self.password)
